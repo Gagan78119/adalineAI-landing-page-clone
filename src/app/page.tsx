@@ -28,7 +28,7 @@ export default function Home() {
           <Navbar />
           
           {/* Main content area - centered vertically */}
-          <div className="flex-1 flex flex-col justify-center">
+          <div className="flex-1 flex flex-col justify-start">
             <Hero />
             <TrustedBy />
           </div>

@@ -8,9 +8,8 @@
  * - Uses semantic HTML for accessibility
  * - Designed to blend seamlessly with the ScenicSection below
  * - No transforms that would interfere with future GSAP animations
+ * - Proper vertical centering to match Adaline.ai
  */
-
-
 
 interface HeroProps {
   headline?: string;
@@ -26,18 +25,24 @@ export default function Hero({
       className="relative w-full bg-transparent"
       data-component="hero"
     >
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 sm:pt-20 lg:pt-24 pb-6 sm:pb-8 text-center">
-        {/* Main Headline */}
-        <h1 className="text-[1.75rem] sm:text-[2rem] md:text-[2.5rem] lg:text-[2.75rem] font-serif font-normal text-adaline-dark leading-[1.2] tracking-[-0.01em]">
-          {headline}
-        </h1>
+      {/* Content positioned at top, not vertically centered */}
+      <div className="pt-8 sm:pt-12 lg:pt-16 pb-4">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 text-center">
+          {/* Main Headline - Matching Adaline's typography */}
+          <h1 
+            className="font-sans font-normal text-adaline-dark leading-[1.15] tracking-[-0.02em]"
+            style={{ fontSize: "clamp(2.25rem, 3.75vw, 3.75rem)" }}
+          >
+            {headline}
+          </h1>
 
-        {/* Optional Subheadline */}
-        {subheadline && (
-          <p className="mt-6 text-lg sm:text-xl text-adaline-dark/70 max-w-2xl mx-auto">
-            {subheadline}
-          </p>
-        )}
+          {/* Optional Subheadline */}
+          {subheadline && (
+            <p className="mt-8 text-lg sm:text-xl text-adaline-dark/70 max-w-2xl mx-auto">
+              {subheadline}
+            </p>
+          )}
+        </div>
       </div>
     </section>
   );
