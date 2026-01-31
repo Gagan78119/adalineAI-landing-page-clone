@@ -1,26 +1,107 @@
 @import "tailwindcss";
 
+/**
+ * Adaline Design System
+ * 
+ * Color Palette:
+ * - Primary: Deep forest green (#1a3a2f)
+ * - Dark: Near-black text (#1a1a1a)
+ * - Cream: Warm background (#f5f3ed)
+ * - Light: Off-white (#faf9f7)
+ * 
+ * Typography:
+ * - Sans: Geist Sans (UI elements)
+ * - Serif: Playfair Display (Headlines) - loaded separately
+ */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Core Colors - matched to original Adaline.ai */
+  --adaline-primary: #1a3a2f;
+  --adaline-primary-light: #2d5a4a;
+  --adaline-dark: #1a3a2f;
+  --adaline-cream: #f0ede6;
+  --adaline-light: #faf9f7;
+  --adaline-muted: #8a8a8a;
+  
+  /* Semantic Colors */
+  --background: var(--adaline-cream);
+  --foreground: var(--adaline-dark);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-adaline-primary: var(--adaline-primary);
+  --color-adaline-primary-light: var(--adaline-primary-light);
+  --color-adaline-dark: var(--adaline-dark);
+  --color-adaline-cream: var(--adaline-cream);
+  --color-adaline-light: var(--adaline-light);
+  --color-adaline-muted: var(--adaline-muted);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-serif: var(--font-playfair);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+/* No dark mode for this marketing site - keep it light and premium */
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+/* Smooth scrolling for the entire page */
+html {
+  scroll-behavior: smooth;
+}
+
+/**
+ * Scene Animation Utilities (Reserved for V2)
+ * 
+ * These classes prepare elements for GSAP ScrollTrigger:
+ * - .scene-layer: Individual animated layers
+ * - .scene-wrapper: Container for sticky positioning
+ * - .scene-pinned: Applied during pin state
+ */
+
+.scene-layer {
+  /* GPU acceleration hint for smooth transforms */
+  will-change: transform;
+  /* Ensure layers stack correctly */
+  backface-visibility: hidden;
+}
+
+.scene-wrapper {
+  /* Ready for position: sticky in V2 */
+  position: relative;
+}
+
+/* Utility for hiding elements until animation triggers */
+.scene-hidden {
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* Ensure images don't cause layout shifts */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Marquee Animation for TrustedBy logos */
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 30s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
 }
