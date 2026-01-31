@@ -6,6 +6,7 @@
  */
 
 export { default as Navbar } from "./Navbar";
+export { default as ProductsDropdown } from "./ProductsDropdown";
 export { default as Hero } from "./Hero";
 export { default as TrustedBy } from "./TrustedBy";
 export { default as ScenicSection } from "./ScenicSection";

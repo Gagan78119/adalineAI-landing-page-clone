@@ -2,46 +2,18 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import ProductsDropdown from "./ProductsDropdown";
 
 /**
  * Navbar Component
  * 
- * Premium navigation bar with animated Products dropdown.
+ * Premium navigation bar with animated Products mega-menu dropdown.
  * Features:
- * - Staggered menu item animations
- * - Rotating chevron icon
- * - Hover effects with background highlights
- * - Backdrop blur effect
+ * - GSAP-powered full-width dropdown
+ * - Hover intent for premium feel
+ * - Staggered animations
+ * - Clean, enterprise-grade design
  */
-
-// Products dropdown menu configuration
-const productsMenu = [
-  {
-    title: "Iterate",
-    subtitle: "Sketch, test and refine",
-    href: "/iterate",
-    number: "1",
-  },
-  {
-    title: "Evaluate",
-    subtitle: "Reflect and measure",
-    href: "/evaluate",
-    number: "2",
-  },
-  {
-    title: "Deploy",
-    subtitle: "From draft to live",
-    href: "/deploy",
-    number: "3",
-  },
-  {
-    title: "Monitor",
-    subtitle: "Insights in real time",
-    href: "/monitor",
-    number: "4",
-  },
-];
 
 export default function Navbar() {
   const [isProductsOpen, setIsProductsOpen] = useState(false);
@@ -56,116 +28,23 @@ export default function Navbar() {
         <div className="relative flex items-center justify-between h-20">
           {/* Desktop Navigation - Left */}
           <div className="hidden md:flex items-center gap-10">
-            {/* Products Dropdown */}
-            <div
-              className="relative"
-              onMouseEnter={() => setIsProductsOpen(true)}
-              onMouseLeave={() => setIsProductsOpen(false)}
-            >
-              <button className="flex items-center gap-2 font-mono text-base tracking-wider text-adaline-dark hover:text-adaline-dark/70 transition-colors uppercase">
-                PRODUCTS
-                <motion.svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 12 12"
-                  className="text-adaline-dark/50"
-                  animate={{ rotate: isProductsOpen ? 180 : 0 }}
-                  transition={{ duration: 0.3, ease: "easeInOut" }}
-                >
-                  <path
-                    d="M2 4L6 8L10 4"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    fill="none"
-                  />
-                </motion.svg>
-              </button>
-
-              {/* Dropdown Menu */}
-              <AnimatePresence>
-                {isProductsOpen && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    transition={{ duration: 0.2, ease: "easeOut" }}
-                    className="absolute top-full left-0 mt-3 w-[280px] bg-white rounded-xl border border-black/10 overflow-hidden"
-                    style={{ boxShadow: "0 8px 32px rgba(0,0,0,0.12)" }}
-                  >
-                    <div className="py-2">
-                      {productsMenu.map((item, index) => (
-                        <motion.div
-                          key={item.href}
-                          initial={{ opacity: 0, x: -20 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{
-                            duration: 0.3,
-                            delay: index * 0.05,
-                            ease: "easeOut",
-                          }}
-                        >
-                          <Link
-                            href={item.href}
-                            className="flex items-start gap-4 px-4 py-3 hover:bg-adaline-cream/50 transition-colors group relative"
-                          >
-                            {/* Number badge */}
-                            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-adaline-cream flex items-center justify-center text-xs font-medium text-adaline-dark">
-                              {item.number}
-                            </div>
-                            
-                            {/* Content */}
-                            <div className="flex-1 min-w-0">
-                              <div className="text-sm font-medium text-adaline-dark group-hover:text-adaline-primary transition-colors">
-                                {item.title}
-                              </div>
-                              <div className="text-xs text-adaline-dark/50 mt-0.5">
-                                {item.subtitle}
-                              </div>
-                            </div>
-
-                            {/* Arrow indicator */}
-                            <motion.div
-                              className="flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity self-center"
-                              initial={{ x: -5 }}
-                              whileHover={{ x: 0 }}
-                            >
-                              <svg
-                                width="16"
-                                height="16"
-                                viewBox="0 0 16 16"
-                                fill="none"
-                                className="text-adaline-dark/50"
-                              >
-                                <path
-                                  d="M6 4L10 8L6 12"
-                                  stroke="currentColor"
-                                  strokeWidth="1.5"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                />
-                              </svg>
-                            </motion.div>
-                          </Link>
-                        </motion.div>
-                      ))}
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
+            {/* Products Dropdown - Using new component */}
+            <ProductsDropdown
+              isOpen={isProductsOpen}
+              onOpen={() => setIsProductsOpen(true)}
+              onClose={() => setIsProductsOpen(false)}
+            />
 
             {/* Other Nav Links */}
             <Link
               href="/pricing"
-              className="font-mono text-base tracking-wider text-adaline-dark hover:text-adaline-dark/70 transition-colors uppercase"
+              className="font-mono text-base tracking-wider text-adaline-dark hover:text-adaline-dark/70 transition-colors duration-200 uppercase"
             >
               PRICING
             </Link>
             <Link
               href="/blog"
-              className="font-mono text-base tracking-wider text-adaline-dark hover:text-adaline-dark/70 transition-colors uppercase"
+              className="font-mono text-base tracking-wider text-adaline-dark hover:text-adaline-dark/70 transition-colors duration-200 uppercase"
             >
               BLOG
             </Link>
@@ -185,14 +64,14 @@ export default function Navbar() {
 
           {/* CTA Buttons - Right */}
           <div className="hidden md:flex items-center gap-4">
-            {/* Watch Demo Button - Filled circle with white play icon */}
+            {/* Watch Demo Button */}
             <Link
               href="/demo"
-              className="flex items-center gap-3 px-4 py-2.5 text-base font-medium tracking-[0.1em] text-adaline-dark border border-adaline-dark/20 rounded-full hover:border-adaline-dark/40 transition-colors bg-white"
+              className="flex items-center gap-3 px-5 py-2.5 text-sm font-medium tracking-[0.1em] text-adaline-dark border border-adaline-dark/15 rounded-full hover:border-adaline-dark/30 transition-all duration-200 bg-white"
             >
               WATCH DEMO
-              <span className="w-7 h-7 rounded-full bg-adaline-primary-light flex items-center justify-center">
-                <svg className="w-6 h-6 ml-0.5 text-adaline-dark" fill="currentColor" viewBox="0 0 24 24">
+              <span className="w-7 h-7 rounded-full bg-adaline-dark flex items-center justify-center">
+                <svg className="w-2.5 h-2.5 ml-0.5 text-white" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M8 5v14l11-7z" />
                 </svg>
               </span>
@@ -201,7 +80,7 @@ export default function Navbar() {
             {/* Primary CTA */}
             <Link
               href="/signup"
-              className="px-8 py-3 text-base font-medium tracking-[0.1em] text-white bg-adaline-primary rounded-full transition-all hover:bg-adaline-primary/90"
+              className="px-7 py-3 text-sm font-medium tracking-[0.1em] text-white bg-adaline-primary rounded-full transition-all duration-200 hover:bg-adaline-primary/90"
             >
               START FOR FREE
             </Link>
@@ -239,70 +118,59 @@ export default function Navbar() {
         </div>
 
         {/* Mobile Menu */}
-        <AnimatePresence>
-          {isMobileMenuOpen && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.2 }}
-              className="md:hidden overflow-hidden"
-            >
-              <div className="py-4 border-t border-adaline-dark/10">
-                <div className="flex flex-col gap-4">
-                  {/* Products section with sub-items */}
-                  <div className="space-y-2">
-                    <span className="text-[13px] font-medium tracking-wide text-adaline-dark">
-                      PRODUCTS
-                    </span>
-                    <div className="pl-4 space-y-2">
-                      {productsMenu.map((item) => (
-                        <Link
-                          key={item.href}
-                          href={item.href}
-                          className="block text-sm text-adaline-dark/70 hover:text-adaline-dark transition-colors"
-                        >
-                          {item.title}
-                        </Link>
-                      ))}
-                    </div>
-                  </div>
-                  
-                  <Link
-                    href="/pricing"
-                    className="text-[13px] font-medium tracking-wide text-adaline-dark"
-                  >
-                    PRICING
-                  </Link>
-                  <Link
-                    href="/blog"
-                    className="text-[13px] font-medium tracking-wide text-adaline-dark"
-                  >
-                    BLOG
-                  </Link>
-                  
-                  <div className="flex flex-col gap-2 pt-4">
-                    <Link
-                      href="/demo"
-                      className="flex items-center justify-center gap-2 px-4 py-2.5 text-[13px] font-medium text-adaline-dark border border-adaline-dark/20 rounded-full"
-                    >
-                      <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M8 5v14l11-7z" />
-                      </svg>
-                      WATCH DEMO
-                    </Link>
-                    <Link
-                      href="/signup"
-                      className="px-5 py-2.5 text-[13px] font-medium text-white bg-adaline-primary rounded-full text-center"
-                    >
-                      START FOR FREE
-                    </Link>
+        {isMobileMenuOpen && (
+          <div className="md:hidden overflow-hidden">
+            <div className="py-4 border-t border-adaline-dark/10">
+              <div className="flex flex-col gap-4">
+                {/* Products section with sub-items */}
+                <div className="space-y-2">
+                  <span className="text-[13px] font-medium tracking-wide text-adaline-dark uppercase">
+                    PRODUCTS
+                  </span>
+                  <div className="pl-4 space-y-2">
+                    <Link href="/iterate" className="block text-sm text-adaline-dark/70 hover:text-adaline-dark transition-colors">Iterate</Link>
+                    <Link href="/evaluate" className="block text-sm text-adaline-dark/70 hover:text-adaline-dark transition-colors">Evaluate</Link>
+                    <Link href="/deploy" className="block text-sm text-adaline-dark/70 hover:text-adaline-dark transition-colors">Deploy</Link>
+                    <Link href="/monitor" className="block text-sm text-adaline-dark/70 hover:text-adaline-dark transition-colors">Monitor</Link>
                   </div>
                 </div>
+                
+                <Link
+                  href="/pricing"
+                  className="text-[13px] font-medium tracking-wide text-adaline-dark uppercase"
+                >
+                  PRICING
+                </Link>
+                <Link
+                  href="/blog"
+                  className="text-[13px] font-medium tracking-wide text-adaline-dark uppercase"
+                >
+                  BLOG
+                </Link>
+                
+                <div className="flex flex-col gap-2 pt-4">
+                  <Link
+                    href="/demo"
+                    className="flex items-center justify-center gap-2 px-4 py-2.5 text-[13px] font-medium text-adaline-dark border border-adaline-dark/20 rounded-full"
+                  >
+                    WATCH DEMO
+                    <span className="w-5 h-5 rounded-full bg-adaline-dark flex items-center justify-center">
+                      <svg className="w-2 h-2 ml-0.5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M8 5v14l11-7z" />
+                      </svg>
+                    </span>
+                  </Link>
+                  <Link
+                    href="/signup"
+                    className="px-5 py-2.5 text-[13px] font-medium text-white bg-adaline-primary rounded-full text-center"
+                  >
+                    START FOR FREE
+                  </Link>
+                </div>
               </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+            </div>
+          </div>
+        )}
       </nav>
     </header>
   );
