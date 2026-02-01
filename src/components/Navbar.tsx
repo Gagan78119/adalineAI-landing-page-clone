@@ -1,8 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import ProductsDropdown from "./ProductsDropdown";
+
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
 /**
  * Navbar Component
@@ -12,15 +18,49 @@ import ProductsDropdown from "./ProductsDropdown";
  * - GSAP-powered full-width dropdown
  * - Hover intent for premium feel
  * - Staggered animations
+ * - Scroll-triggered fade-in effect
  * - Clean, enterprise-grade design
  */
 
 export default function Navbar() {
   const [isProductsOpen, setIsProductsOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const navRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    if (!navRef.current) return;
+
+    // Fade out as user scrolls down
+    ScrollTrigger.create({
+      trigger: document.body,
+      start: "top top",
+      end: "+=500",
+      scrub: 1,
+      onUpdate: (self) => {
+        if (navRef.current) {
+          const progress = self.progress;
+          const opacity = 1 - progress; // Fade completely into background
+          
+          gsap.set(navRef.current, {
+            opacity: opacity,
+            backdropFilter: `blur(${progress * 10}px)`,
+          });
+        }
+      },
+    });
+
+    return () => {
+      ScrollTrigger.getAll().forEach(trigger => {
+        if (trigger.vars.trigger === document.body && trigger.vars.end === "+=500") {
+          trigger.kill();
+        }
+      });
+    };
+  }, []);
 
   return (
     <header
+      ref={navRef}
       className="sticky top-0 z-50 w-full"
       data-component="navbar"
     >

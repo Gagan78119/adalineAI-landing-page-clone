@@ -1,18 +1,26 @@
 "use client";
 
 import Image from "next/image";
-import { motion } from "framer-motion";
+import { useEffect, useRef } from "react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
 /**
  * TrustedBy Component
  * 
  * Displays a horizontal scrolling marquee of company logos.
  * Uses CSS animation for smooth infinite scroll effect.
+ * Fades out smoothly as user scrolls down.
  * 
  * Architecture Notes:
  * - Uses actual SVG logo files from public/images/logos
  * - Logos are duplicated to create seamless loop
  * - CSS mask-image used for fade edges instead of manual gradient divs
+ * - GSAP ScrollTrigger for fade-out effect
  */
 
 // Company logos configuration - matching Adaline's displayed logos
@@ -42,16 +50,45 @@ function LogoItem({ company }: { company: typeof companies[0] }) {
 }
 
 export default function TrustedBy() {
+  const sectionRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    if (!sectionRef.current) return;
+
+    // Fade out as user scrolls down
+    ScrollTrigger.create({
+      trigger: sectionRef.current,
+      start: "top center",
+      end: "bottom top",
+      scrub: 1,
+      onUpdate: (self) => {
+        if (sectionRef.current) {
+          const progress = self.progress;
+          const opacity = 1 - progress; // Fade to 20% opacity
+          
+          gsap.set(sectionRef.current, {
+            opacity: opacity,
+          });
+        }
+      },
+    });
+
+    return () => {
+      ScrollTrigger.getAll().forEach(trigger => {
+        if (trigger.vars.trigger === sectionRef.current) {
+          trigger.kill();
+        }
+      });
+    };
+  }, []);
+
   return (
     <section
+      ref={sectionRef}
       className="relative w-full max-w-5xl mx-auto bg-transparent py-4 overflow-hidden"
       data-component="trusted-by"
     >
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
-      >
+      <div>
         {/* Section Label */}
         <p className="text-center text-[10px] font-semibold tracking-[0.2em] text-adaline-dark/40 uppercase mb-6">
           Trusted By
@@ -81,7 +118,7 @@ export default function TrustedBy() {
             </div>
           </div>
         </div>
-      </motion.div>
+      </div>
     </section>
   );
 }

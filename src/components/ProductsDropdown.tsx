@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { useRef, useEffect, useCallback } from "react";
 import gsap from "gsap";
+import MultilayerIcon from "./MultilayerIcon";
 
 /**
  * ProductsDropdown Component - Adaline Style Mega Menu
@@ -12,17 +12,34 @@ import gsap from "gsap";
  * - Hover intent delay (~100ms)
  * - GSAP-powered smooth animations
  * - Staggered content animation
- * - Icon wrapper animations on hover
+ * - Multilayer living icons with independent layer animations
  * - Soft background highlights
  */
 
-// Products configuration with icons and sub-links
-const products = [
+// Link type definition
+interface ProductLink {
+  label: string;
+  href: string;
+  external?: boolean;
+}
+
+// Product type definition
+interface Product {
+  id: string;
+  title: string;
+  heading: string;
+  iconType: "iterate" | "evaluate" | "deploy" | "monitor";
+  number: string;
+  links: ProductLink[];
+}
+
+// Products configuration with icon types
+const products: Product[] = [
   {
     id: "iterate",
     title: "ITERATE",
     heading: "Sketch, test\nand refine",
-    icon: "/images/icons/heptagon-icon.svg",
+    iconType: "iterate",
     number: "1",
     links: [
       { label: "Editor", href: "/iterate/editor" },
@@ -34,7 +51,7 @@ const products = [
     id: "evaluate",
     title: "EVALUATE",
     heading: "Reflect\nand measure",
-    icon: "/images/icons/dottedcircle-icon.svg",
+    iconType: "evaluate",
     number: "2",
     links: [
       { label: "Evaluations", href: "/evaluate/evaluations" },
@@ -45,7 +62,7 @@ const products = [
     id: "deploy",
     title: "DEPLOY",
     heading: "From draft\nto live",
-    icon: "/images/icons/nonagon-icon.svg",
+    iconType: "deploy",
     number: "3",
     links: [
       { label: "Deployments", href: "/deploy/deployments" },
@@ -57,7 +74,7 @@ const products = [
     id: "monitor",
     title: "MONITOR",
     heading: "Insights\nin real time",
-    icon: "/images/icons/circle-icon.svg",
+    iconType: "monitor",
     number: "4",
     links: [
       { label: "Logs", href: "/monitor/logs" },
@@ -281,35 +298,6 @@ export default function ProductsDropdown({ isOpen, onOpen, onClose }: ProductsDr
     };
   }, []);
 
-  // Icon card hover animation
-  const handleCardMouseEnter = (e: React.MouseEvent<HTMLDivElement>) => {
-    const card = e.currentTarget;
-    const iconWrapper = card.querySelector(".icon-wrapper");
-    
-    if (iconWrapper) {
-      gsap.to(iconWrapper, {
-        scale: 1.05,
-        y: -2,
-        duration: 0.25,
-        ease: "power2.out",
-      });
-    }
-  };
-
-  const handleCardMouseLeave = (e: React.MouseEvent<HTMLDivElement>) => {
-    const card = e.currentTarget;
-    const iconWrapper = card.querySelector(".icon-wrapper");
-    
-    if (iconWrapper) {
-      gsap.to(iconWrapper, {
-        scale: 1,
-        y: 0,
-        duration: 0.25,
-        ease: "power2.out",
-      });
-    }
-  };
-
   // Link hover animation
   const handleLinkMouseEnter = (e: React.MouseEvent<HTMLAnchorElement>) => {
     gsap.to(e.currentTarget, {
@@ -365,33 +353,41 @@ export default function ProductsDropdown({ isOpen, onOpen, onClose }: ProductsDr
           willChange: "transform, opacity",
         }}
       >
+        {/* CRITICAL: Horizontal dotted line divider */}
+        <div className="absolute left-0 right-0 top-0 h-[2px] overflow-hidden pointer-events-none">
+          <svg 
+            className="absolute left-1/2 -translate-x-1/2 w-[200vw] min-w-[4000px]" 
+            height="2" 
+            viewBox="0 0 4000 2" 
+            fill="none" 
+            xmlns="http://www.w3.org/2000/svg" 
+            style={{ opacity: 0.2 }}
+          >
+            <path 
+              d="M0 1 H4000" 
+              stroke="#264013" 
+              strokeWidth="1" 
+              strokeDasharray="4 4" 
+              vectorEffect="non-scaling-stroke"
+            />
+          </svg>
+        </div>
         <div className="max-w-7xl mx-auto px-8 sm:px-12 lg:px-16 py-12">
-          {/* Top Section - Icon Cards */}
+          {/* Top Section - Multilayer Icon Cards */}
           <div className="grid grid-cols-4 gap-8 mb-10">
             {products.map((product, index) => (
               <div
                 key={product.id}
                 ref={(el) => setIconCardRef(el, index)}
                 className="flex flex-col items-start cursor-pointer group"
-                onMouseEnter={handleCardMouseEnter}
-                onMouseLeave={handleCardMouseLeave}
                 style={{ willChange: "transform, opacity" }}
               >
-                {/* Icon with number badge */}
-                <div className="icon-wrapper relative w-24 h-24 mb-3">
-                  <div className="w-full h-full text-adaline-dark/80">
-                    <Image
-                      src={product.icon}
-                      alt={product.title}
-                      fill
-                      className="object-contain"
-                    />
-                  </div>
-                  {/* Number badge */}
-                  <span className="absolute top-0 right-0 w-6 h-6 rounded-full bg-[#d4e4c9] flex items-center justify-center text-xs font-medium text-adaline-dark">
-                    {product.number}
-                  </span>
-                </div>
+                {/* Multilayer Living Icon */}
+                <MultilayerIcon
+                  type={product.iconType}
+                  number={product.number}
+                  className="w-28 h-28 mb-3"
+                />
                 {/* Product title */}
                 <span className="text-sm font-medium tracking-wider text-adaline-dark uppercase">
                   {product.title}

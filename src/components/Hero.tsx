@@ -1,3 +1,13 @@
+"use client";
+
+import { useEffect, useRef } from "react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger);
+}
+
 /**
  * Hero Component
  * 
@@ -7,8 +17,8 @@
  * Architecture Notes:
  * - Uses semantic HTML for accessibility
  * - Designed to blend seamlessly with the ScenicSection below
- * - No transforms that would interfere with future GSAP animations
- * - Proper vertical centering to match Adaline.ai
+ * - Fades in when specific frame comes into viewport
+ * - GSAP ScrollTrigger for smooth scroll-based animations
  */
 
 interface HeroProps {
@@ -20,8 +30,43 @@ export default function Hero({
   headline = "The single platform to iterate, evaluate, deploy, and monitor AI agents",
   subheadline,
 }: HeroProps) {
+  const heroRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    if (!heroRef.current) return;
+
+    // Fade out as user scrolls down
+    ScrollTrigger.create({
+      trigger: heroRef.current,
+      start: "top top",
+      end: "bottom top",
+      scrub: 1,
+      onUpdate: (self) => {
+        if (heroRef.current) {
+          const progress = self.progress;
+          const opacity = 1 - progress;
+          const y = progress * 50;
+          
+          gsap.set(heroRef.current, {
+            opacity: opacity,
+            y: y,
+          });
+        }
+      },
+    });
+
+    return () => {
+      ScrollTrigger.getAll().forEach(trigger => {
+        if (trigger.vars.trigger === heroRef.current) {
+          trigger.kill();
+        }
+      });
+    };
+  }, []);
+
   return (
     <section
+      ref={heroRef}
       className="relative w-full bg-transparent"
       data-component="hero"
     >
