@@ -62,64 +62,70 @@ const ASSETS: Record<ShapeType, string> = {
 // ============================================
 
 const ITERATE_COMPOSITION: ShapeDefinition[] = [
-  // PRECISE REFERENCE MATCH: 3 main overlapping + 1 satellite
-  // Cluster 1: Top-Left (Nonagon + Heptagon overlap)
+  // PRECISE REFERENCE MATCH: Exact positioning from original images
+  // Top polygon (medium)
   { type: "nonagon", role: "anchor", size: 48, x: 12, y: 8, animate: true, speed: 120, hasPlus: false },
-  { type: "heptagon", role: "anchor", size: 48, x: 12, y: 8, animate: true, speed: 115, direction: -1, hasPlus: true, plusSize: 50 },
+  { type: "heptagon", role: "anchor", size: 48, x: 12, y: 8, animate: true, speed: 115, direction: -1, hasPlus: true, plusSize: 140 },
   
-  // Cluster 2: Bottom-Right (Nonagon + Heptagon overlap, larger)
-  { type: "nonagon", role: "structure", size: 52, x: 35, y: 42, animate: true, speed: 100, direction: -1, hasPlus: false },
-  { type: "heptagon", role: "structure", size: 52, x: 35, y: 42, animate: true, speed: 95, hasPlus: true, plusSize: 50 },
+  // Bottom-right polygon (largest)
+  { type: "nonagon", role: "structure", size: 54, x: 28, y: 44, animate: true, speed: 100, direction: -1, hasPlus: false },
+  { type: "heptagon", role: "structure", size: 54, x: 28, y: 44, animate: true, speed: 95, hasPlus: true, plusSize: 140 },
   
-  // Cluster 3: Left (Nonagon + Heptagon overlap, medium)
-  { type: "nonagon", role: "structure", size: 38, x: 0, y: 42, animate: true, speed: 90, hasPlus: false },
-  { type: "heptagon", role: "structure", size: 38, x: 0, y: 42, animate: true, speed: 85, direction: -1, hasPlus: true, plusSize: 55 },
+  // Left polygon (medium)
+  { type: "nonagon", role: "structure", size: 44, x: -4, y: 38, animate: true, speed: 90, hasPlus: false },
+  { type: "heptagon", role: "structure", size: 44, x: -4, y: 38, animate: true, speed: 85, direction: -1, hasPlus: true, plusSize: 150 },
   
-  // Cluster 4: Top-Right Satellite (Nonagon + Heptagon overlap, small)
-  { type: "nonagon", role: "accent", size: 22, x: 68, y: 18, animate: true, speed: 70, direction: -1, hasPlus: false },
-  { type: "heptagon", role: "accent", size: 22, x: 68, y: 18, animate: true, speed: 65, hasPlus: true, plusSize: 55 },
+  // Top-right satellite (small)
+  { type: "nonagon", role: "accent", size: 20, x: 70, y: 18, animate: true, speed: 70, direction: -1, hasPlus: false },
+  { type: "heptagon", role: "accent", size: 20, x: 70, y: 18, animate: true, speed: 65, hasPlus: true, plusSize: 150 },
 ];
 
 const EVALUATE_COMPOSITION: ShapeDefinition[] = [
-  // PRECISE REFERENCE MATCH: Large top + 2 bottom overlapping + 1 right satellite
-  // 1. Large Dotted (Top-Center)
-  { type: "dotted-circle", role: "anchor", size: 55, x: 20, y: 8, animate: true, speed: 110, hasPlus: true, plusSize: 50 },
-  // 2. Medium Dotted (Bottom-Left)
-  { type: "dotted-circle", role: "structure", size: 50, x: 5, y: 48, animate: true, speed: 95, direction: -1, hasPlus: true, plusSize: 50 },
-  // 3. Medium Dotted (Bottom-Center, overlapping #2)
-  { type: "dotted-circle", role: "structure", size: 45, x: 35, y: 55, animate: true, speed: 100, hasPlus: true, plusSize: 50 },
-  // 4. Small Dotted (Right Satellite)
-  { type: "dotted-circle", role: "accent", size: 28, x: 70, y: 30, animate: true, speed: 80, direction: -1, hasPlus: true, plusSize: 55 },
+  // PRECISE REFERENCE MATCH: Exact positioning from original images
+  // Top-center circle
+  { type: "dotted-circle", role: "anchor", size: 54, x: 22, y: 8, animate: true, speed: 110, hasPlus: true, plusSize: 140 },
+  
+  // Bottom-left circle
+  { type: "dotted-circle", role: "structure", size: 52, x: 4, y: 46, animate: true, speed: 95, direction: -1, hasPlus: true, plusSize: 140 },
+  
+  // Bottom-right circle
+  { type: "dotted-circle", role: "structure", size: 48, x: 38, y: 50, animate: true, speed: 100, hasPlus: true, plusSize: 140 },
+  
+  // Right satellite
+  { type: "dotted-circle", role: "accent", size: 22, x: 76, y: 32, animate: true, speed: 80, direction: -1, hasPlus: true, plusSize: 150 },
 ];
 
 const DEPLOY_COMPOSITION: ShapeDefinition[] = [
-  // PRECISE REFERENCE MATCH: Large bottom-left + medium center-top + 2 small
-  // 1. Large Gear (Bottom-Left)
-  { type: "innercone", role: "anchor", size: 72, x: 5, y: 38, animate: true, speed: 140, hasPlus: true, plusSize: 50 },
-  // 2. Medium Gear (Top-Center/Right)
-  { type: "innercone", role: "structure", size: 48, x: 45, y: 15, animate: true, speed: 100, direction: -1, hasPlus: true, plusSize: 50 },
-  // 3. Small Gear (Top-Left/Center)
-  { type: "innercone", role: "structure", size: 35, x: 30, y: 5, animate: true, speed: 80, hasPlus: true, plusSize: 55 },
-  // 4. Tiny Gear (Bottom-Right)
-  { type: "innercone", role: "accent", size: 28, x: 62, y: 68, animate: true, speed: 60, direction: -1, hasPlus: true, plusSize: 55 },
+  // PRECISE REFERENCE MATCH: Exact positioning from original images
+  // Large gear (bottom-left)
+  { type: "innercone", role: "anchor", size: 72, x: 8, y: 38, animate: true, speed: 140, hasPlus: true, plusSize: 140 },
+  
+  // Medium gear (top-right)
+  { type: "innercone", role: "structure", size: 50, x: 46, y: 10, animate: true, speed: 100, direction: -1, hasPlus: true, plusSize: 140 },
+  
+  // Small gear (top-center)
+  { type: "innercone", role: "structure", size: 32, x: 30, y: 2, animate: true, speed: 80, hasPlus: true, plusSize: 150 },
+  
+  // Tiny gear (bottom-right)
+  { type: "innercone", role: "accent", size: 26, x: 64, y: 68, animate: true, speed: 60, direction: -1, hasPlus: true, plusSize: 150 },
 ];
 
 const MONITOR_COMPOSITION: ShapeDefinition[] = [
-  // PRECISE REFERENCE MATCH: 3 concentric pairs + 1 top-right satellite
-  // Pair 1: Large Concentric (Top-Left)
-  { type: "dotted-circle", role: "anchor", size: 60, x: 10, y: 10, animate: true, speed: 120 },
-  { type: "circle", role: "structure", size: 44, x: 18, y: 18, animate: false, hasPlus: true, plusSize: 50 },
+  // PRECISE REFERENCE MATCH: Exact positioning from original images
+  // Large concentric (top-left)
+  { type: "dotted-circle", role: "anchor", size: 62, x: 10, y: 10, animate: true, speed: 120 },
+  { type: "circle", role: "structure", size: 42, x: 20, y: 20, animate: false, hasPlus: true, plusSize: 140 },
   
-  // Pair 2: Medium Concentric (Bottom-Right)
-  { type: "dotted-circle", role: "structure", size: 50, x: 45, y: 50, animate: true, speed: 100, direction: -1 },
-  { type: "circle", role: "structure", size: 36, x: 52, y: 57, animate: false, hasPlus: true, plusSize: 50 },
+  // Medium concentric (bottom-right)
+  { type: "dotted-circle", role: "structure", size: 52, x: 46, y: 52, animate: true, speed: 100, direction: -1 },
+  { type: "circle", role: "structure", size: 36, x: 54, y: 60, animate: false, hasPlus: true, plusSize: 140 },
 
-  // Pair 3: Small Concentric (Bottom-Left)
-  { type: "dotted-circle", role: "structure", size: 38, x: 8, y: 62, animate: true, speed: 80 },
-  { type: "circle", role: "structure", size: 28, x: 13, y: 67, animate: false, hasPlus: true, plusSize: 55 },
+  // Small concentric (bottom-left)
+  { type: "dotted-circle", role: "structure", size: 42, x: 4, y: 62, animate: true, speed: 80 },
+  { type: "circle", role: "structure", size: 30, x: 10, y: 68, animate: false, hasPlus: true, plusSize: 150 },
 
-  // Satellite: Tiny (Top-Right)
-  { type: "dotted-circle", role: "accent", size: 26, x: 70, y: 15, animate: true, speed: 70, direction: -1, hasPlus: true, plusSize: 55 },
+  // Tiny satellite (top-right)
+  { type: "dotted-circle", role: "accent", size: 24, x: 76, y: 16, animate: true, speed: 70, direction: -1, hasPlus: true, plusSize: 150 },
 ];
 
 const ICON_COMPOSITIONS: Record<IconType, ShapeDefinition[]> = {
@@ -143,23 +149,36 @@ export default function MultilayerIcon({ type, number, className = "" }: Multila
   const composition = ICON_COMPOSITIONS[type];
   const containerRef = useRef<HTMLDivElement>(null);
   const layerRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const plusRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   // Init Animations
   useEffect(() => {
     const ctx = gsap.context(() => {
       composition.forEach((item, i) => {
         const el = layerRefs.current[i];
+        const plusEl = plusRefs.current[i];
         if (!el || !item.animate) return;
 
         const duration = item.speed || 100;
         const direction = item.direction || 1;
 
+        // Rotate the shape
         gsap.to(el, {
           rotation: direction === 1 ? "+=360" : "-=360",
           duration: duration,
           repeat: -1,
           ease: "none",
         });
+
+        // Counter-rotate the plus icon to keep it straight
+        if (plusEl && item.hasPlus) {
+          gsap.to(plusEl, {
+            rotation: direction === 1 ? "-=360" : "+=360",
+            duration: duration,
+            repeat: -1,
+            ease: "none",
+          });
+        }
       });
     }, containerRef);
 
@@ -198,13 +217,15 @@ export default function MultilayerIcon({ type, number, className = "" }: Multila
             }}
           />
 
-          {/* Plus Icon Mask - Scaled relative to the shape */}
+          {/* Plus Icon Mask - Larger and kept straight (no rotation) */}
           {item.hasPlus && (
             <div 
+              ref={(el) => { plusRefs.current[i] = el; }}
               className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#2d4a1f] opacity-80"
               style={{
                 width: `${item.plusSize || 20}%`,
                 height: `${item.plusSize || 20}%`,
+                transformOrigin: "center center",
                 maskImage: `url(${ASSETS.plus})`,
                 maskSize: "contain",
                 maskRepeat: "no-repeat",
@@ -219,15 +240,32 @@ export default function MultilayerIcon({ type, number, className = "" }: Multila
         </div>
       ))}
 
-      {/* Number Badge */}
+      {/* Number Badge - positioned close to the right of icon */}
       <span 
-        className="absolute w-10 h-10 rounded-full flex items-center justify-center font-bold z-10 bg-[#e8f5e9] border border-[#2d4a1f]/20 text-[#2d4a1f] text-[15px]"
+        className="absolute w-8 h-8 rounded-full flex items-center justify-center font-bold z-10 border border-[#2d4a1f]/20 text-[#2d4a1f] text-[14px]"
         style={{ 
-          right: -10,
-          top: -10,
+          left: 'calc(100% + 8px)',
+          top: '50%',
+          transform: 'translateY(-50%)',
+          backgroundColor: '#ddeabd',
         }}
       >
         {number}
+      </span>
+
+      {/* Text Label - positioned close after number */}
+      <span 
+        className="absolute font-semibold tracking-wide z-10 text-[#2d4a1f] uppercase"
+        style={{ 
+          left: 'calc(100% + 44px)',
+          top: '50%',
+          transform: 'translateY(-50%)',
+          fontSize: '14px',
+          letterSpacing: '0.5px',
+          whiteSpace: 'nowrap',
+        }}
+      >
+        {type}
       </span>
     </div>
   );

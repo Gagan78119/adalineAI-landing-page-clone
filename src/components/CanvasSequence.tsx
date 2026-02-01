@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect, useCallback } from "react";
+import { useRef, useEffect, useCallback, useState } from "react";
 import { useFrameSequence } from "@/hooks/useFrameSequence";
 
 interface CanvasSequenceProps {
@@ -19,6 +19,7 @@ interface CanvasSequenceProps {
  * 
  * Renders a frame sequence on an HTML5 canvas based on scroll progress.
  * Handles responsive sizing, device pixel ratio, and "cover" aspect ratio behavior.
+ * At the end of the sequence, shows a hero product shot with zoom-out effect.
  * 
  * @param progress - Current scroll progress (0-1) to determine which frame to show
  * @param className - Optional CSS class for styling
@@ -35,8 +36,23 @@ export default function CanvasSequence({
   const containerRef = useRef<HTMLDivElement>(null);
   const animationFrameRef = useRef<number | undefined>(undefined);
   const lastProgressRef = useRef<number>(-1);
+  const heroImageRef = useRef<HTMLImageElement | null>(null);
+  const [heroImageLoaded, setHeroImageLoaded] = useState(false);
 
   const { frames, isLoading, loadProgress, getFrameByProgress } = useFrameSequence();
+
+  // Load hero product shot image
+  useEffect(() => {
+    const heroImg = new Image();
+    heroImg.src = "/images/scenic/hero-product-shot.png";
+    heroImg.onload = () => {
+      heroImageRef.current = heroImg;
+      setHeroImageLoaded(true);
+    };
+    heroImg.onerror = () => {
+      console.warn("Failed to load hero product shot");
+    };
+  }, []);
 
   // Notify parent of loading progress
   useEffect(() => {
@@ -109,8 +125,81 @@ export default function CanvasSequence({
   }, []);
 
   /**
+   * Draw hero product shot with scaling, padding, and optional border
+   * Draws ON TOP of existing canvas content (doesn't clear) for layering effect
+   */
+  const drawHeroWithEffects = useCallback((img: HTMLImageElement, scale: number, showBorder: boolean) => {
+    const canvas = canvasRef.current;
+    const container = containerRef.current;
+    if (!canvas || !container) return;
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    // Get container dimensions (canvas is already sized by drawFrame)
+    const containerWidth = container.clientWidth;
+    const containerHeight = container.clientHeight;
+
+    // DON'T clear canvas - we're drawing on top of the background frame
+
+    // Define padding (image won't touch edges)
+    const padding = 40;
+    const availableWidth = containerWidth - (padding * 2);
+    const availableHeight = containerHeight - (padding * 2);
+
+    // Calculate dimensions to fit within padded area (contain behavior)
+    const imgAspect = img.naturalWidth / img.naturalHeight;
+    const availableAspect = availableWidth / availableHeight;
+
+    let drawWidth: number;
+    let drawHeight: number;
+
+    if (availableAspect > imgAspect) {
+      // Available area is wider - fit to height
+      drawHeight = availableHeight * scale;
+      drawWidth = drawHeight * imgAspect;
+    } else {
+      // Available area is taller - fit to width
+      drawWidth = availableWidth * scale;
+      drawHeight = drawWidth / imgAspect;
+    }
+
+    // Center the image
+    const drawX = (containerWidth - drawWidth) / 2;
+    const drawY = (containerHeight - drawHeight) / 2;
+
+    // Draw border if specified (at final frames)
+    if (showBorder) {
+      const borderRadius = 24;
+      const borderWidth = 2;
+      const borderColor = '#264013';
+
+      // Draw rounded rectangle border
+      ctx.beginPath();
+      ctx.roundRect(drawX - borderWidth, drawY - borderWidth, drawWidth + borderWidth * 2, drawHeight + borderWidth * 2, borderRadius);
+      ctx.strokeStyle = borderColor;
+      ctx.lineWidth = borderWidth;
+      ctx.stroke();
+
+      // Clip to rounded rectangle for image
+      ctx.save();
+      ctx.beginPath();
+      ctx.roundRect(drawX, drawY, drawWidth, drawHeight, borderRadius);
+      ctx.clip();
+    }
+
+    // Draw image on top of background
+    ctx.drawImage(img, drawX, drawY, drawWidth, drawHeight);
+
+    if (showBorder) {
+      ctx.restore();
+    }
+  }, []);
+
+  /**
    * Update canvas when progress changes
    * Uses requestAnimationFrame for smooth rendering
+   * Shows hero image with zoom-out effect at the end (progress > 0.95)
    */
   useEffect(() => {
     // Skip if progress hasn't changed significantly
@@ -123,9 +212,31 @@ export default function CanvasSequence({
     }
 
     animationFrameRef.current = requestAnimationFrame(() => {
+      // Always draw the background frame first
       const frame = getFrameByProgress(progress);
       if (frame && frame.complete && frame.naturalWidth > 0) {
         drawFrame(frame);
+      }
+
+      // Frame 230 is at index ~107/121, progress ~0.885
+      // Frame 272 is at index ~116/121, progress ~0.967 (start border)
+      // Frame 276 is at index ~117/121, progress ~0.975
+      // Frame 280 is at index ~118/121, progress ~0.983
+      // Layer hero image on top starting from frame 230 (progress 0.885)
+      if (progress > 0.885 && heroImageRef.current && heroImageLoaded) {
+        // Calculate hero reveal progress (0.885 to 1.0)
+        const heroStartProgress = 0.885;
+        const heroBorderProgress = 0.967; // Frame 272 (2 frames before 280)
+        const heroProgress = (progress - heroStartProgress) / (1.0 - heroStartProgress);
+        
+        // Gradually scale from 0.6 to 1.0 (revealing effect)
+        const scale = 0.6 + (heroProgress * 0.4);
+        
+        // Show border starting at frame 272 (progress >= 0.967)
+        const showBorder = progress >= heroBorderProgress;
+        
+        // Draw hero on top of background (don't clear canvas)
+        drawHeroWithEffects(heroImageRef.current, scale, showBorder);
       }
     });
 
@@ -134,7 +245,7 @@ export default function CanvasSequence({
         cancelAnimationFrame(animationFrameRef.current);
       }
     };
-  }, [progress, getFrameByProgress, drawFrame]);
+  }, [progress, getFrameByProgress, drawFrame, drawHeroWithEffects, heroImageLoaded]);
 
   /**
    * Handle window resize
