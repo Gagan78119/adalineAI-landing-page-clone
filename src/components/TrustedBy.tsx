@@ -64,7 +64,7 @@ export default function TrustedBy() {
       onUpdate: (self) => {
         if (sectionRef.current) {
           const progress = self.progress;
-          const opacity = 1 - progress; // Fade to 20% opacity
+          const opacity = 1 - progress; // Fade to completely transparent
           
           gsap.set(sectionRef.current, {
             opacity: opacity,

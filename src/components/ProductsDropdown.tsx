@@ -8,22 +8,19 @@ import MultilayerIcon from "./MultilayerIcon";
 /**
  * ProductsDropdown Component - Adaline Style Mega Menu
  * 
- * Premium full-width dropdown with:
- * - Hover intent delay (~100ms)
- * - GSAP-powered smooth animations
- * - Staggered content animation
- * - Multilayer living icons with independent layer animations
- * - Soft background highlights
+ * VERSION 2 - EXACT RECONSTRUCTION
+ * - Split layout: Icons Top / Text Bottom
+ * - Double dotted lines
+ * - Bigger sizes (180px icons, 38px headings)
+ * - Gear overlap logic
  */
 
-// Link type definition
 interface ProductLink {
   label: string;
   href: string;
   external?: boolean;
 }
 
-// Product type definition
 interface Product {
   id: string;
   title: string;
@@ -33,7 +30,6 @@ interface Product {
   links: ProductLink[];
 }
 
-// Products configuration with icon types
 const products: Product[] = [
   {
     id: "iterate",
@@ -89,239 +85,117 @@ interface ProductsDropdownProps {
   onClose: () => void;
 }
 
+const DottedLine = ({ className = "" }: { className?: string }) => (
+  <div className={`absolute left-0 right-0 h-[2px] overflow-hidden pointer-events-none ${className}`}>
+    <svg 
+      className="absolute left-1/2 -translate-x-1/2 w-[200vw] min-w-[4000px]" 
+      height="2" 
+      viewBox="0 0 4000 2" 
+      fill="none" 
+      xmlns="http://www.w3.org/2000/svg" 
+      style={{ opacity: 0.2 }}
+    >
+      <path 
+        d="M0 1 H4000" 
+        stroke="#264013" 
+        strokeWidth="1" 
+        strokeDasharray="4 4" 
+        vectorEffect="non-scaling-stroke"
+      />
+    </svg>
+  </div>
+);
+
 export default function ProductsDropdown({ isOpen, onOpen, onClose }: ProductsDropdownProps) {
-  // Refs for GSAP animations
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const iconCardsRef = useRef<(HTMLDivElement | null)[]>([]);
-  const contentColumnsRef = useRef<(HTMLDivElement | null)[]>([]);
-  const dividerRef = useRef<HTMLDivElement>(null);
+  const iconRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const textRefs = useRef<(HTMLDivElement | null)[]>([]);
   const hoverTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const isAnimatingRef = useRef(false);
   const chevronRef = useRef<SVGSVGElement>(null);
 
-  // Set card ref
-  const setIconCardRef = useCallback((el: HTMLDivElement | null, index: number) => {
-    iconCardsRef.current[index] = el;
-  }, []);
+  // Animation constants
+  const DURATION = 0.4;
+  const STAGGER = 0.05;
 
-  // Set column ref
-  const setColumnRef = useCallback((el: HTMLDivElement | null, index: number) => {
-    contentColumnsRef.current[index] = el;
-  }, []);
-
-  // Open dropdown with GSAP animation
   const openDropdown = useCallback(() => {
-    if (isAnimatingRef.current || !dropdownRef.current) return;
+    if (!dropdownRef.current) return;
     
-    isAnimatingRef.current = true;
     onOpen();
-
     const dropdown = dropdownRef.current;
-    const iconCards = iconCardsRef.current.filter(Boolean);
-    const columns = contentColumnsRef.current.filter(Boolean);
-    const divider = dividerRef.current;
+    const icons = iconRefs.current.filter(Boolean);
+    const texts = textRefs.current.filter(Boolean);
 
-    // Kill any existing animations
-    gsap.killTweensOf([dropdown, ...iconCards, ...columns, divider]);
+    gsap.killTweensOf([dropdown, ...icons, ...texts]);
 
-    // Create GSAP timeline for orchestrated animation
-    const tl = gsap.timeline({
-      onComplete: () => {
-        isAnimatingRef.current = false;
-      },
-    });
+    const tl = gsap.timeline();
 
-    // Phase 1: Container reveal
-    tl.fromTo(
-      dropdown,
-      {
-        opacity: 0,
-        y: -12,
-        scale: 0.98,
-      },
-      {
-        opacity: 1,
-        y: 0,
-        scale: 1,
-        duration: 0.3,
-        ease: "power3.out",
-      }
+    // Panel Slide
+    tl.fromTo(dropdown, 
+      { y: -16, opacity: 0 },
+      { y: 0, opacity: 1, duration: DURATION, ease: "cubic-bezier(0.4, 0, 0.2, 1)" }
     );
 
-    // Phase 2: Icon cards stagger animation
-    tl.fromTo(
-      iconCards,
-      {
-        opacity: 0,
-        y: 10,
-      },
-      {
-        opacity: 1,
-        y: 0,
-        duration: 0.25,
-        stagger: 0.04,
-        ease: "power2.out",
-      },
-      "-=0.15"
+    // Icons Stagger
+    tl.fromTo(icons,
+      { y: 15, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.35, stagger: STAGGER, ease: "power2.out" },
+      "-=0.25"
     );
 
-    // Phase 3: Divider line
-    if (divider) {
-      tl.fromTo(
-        divider,
-        {
-          scaleX: 0,
-          opacity: 0,
-        },
-        {
-          scaleX: 1,
-          opacity: 1,
-          duration: 0.3,
-          ease: "power2.out",
-        },
-        "-=0.2"
-      );
-    }
-
-    // Phase 4: Content columns stagger
-    tl.fromTo(
-      columns,
-      {
-        opacity: 0,
-        y: 8,
-      },
-      {
-        opacity: 1,
-        y: 0,
-        duration: 0.25,
-        stagger: 0.04,
-        ease: "power2.out",
-      },
-      "-=0.15"
+    // Text Stagger (slightly delayed after icons)
+    tl.fromTo(texts,
+      { y: 10, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.35, stagger: STAGGER, ease: "power2.out" },
+      "-=0.3"
     );
 
-    // Animate chevron rotation
     if (chevronRef.current) {
-      gsap.to(chevronRef.current, {
-        rotation: 180,
-        duration: 0.3,
-        ease: "power2.inOut",
-      });
+      gsap.to(chevronRef.current, { rotation: 180, duration: 0.3 });
     }
   }, [onOpen]);
 
-  // Close dropdown with GSAP animation
   const closeDropdown = useCallback(() => {
-    if (isAnimatingRef.current || !dropdownRef.current) return;
+    if (!dropdownRef.current) return;
     
-    isAnimatingRef.current = true;
-
     const dropdown = dropdownRef.current;
-    const iconCards = iconCardsRef.current.filter(Boolean);
-    const columns = contentColumnsRef.current.filter(Boolean);
-
-    // Create GSAP timeline for smooth exit
+    
     const tl = gsap.timeline({
-      onComplete: () => {
-        onClose();
-        isAnimatingRef.current = false;
-      },
+      onComplete: onClose
     });
 
-    // Fade out content first
-    tl.to([...columns.reverse(), ...iconCards.reverse()], {
+    tl.to(dropdown, {
+      y: -10,
       opacity: 0,
-      y: -6,
-      duration: 0.15,
-      stagger: 0.02,
-      ease: "power2.in",
+      duration: 0.2,
+      ease: "power2.in"
     });
 
-    // Then fade out container
-    tl.to(
-      dropdown,
-      {
-        opacity: 0,
-        y: -12,
-        scale: 0.98,
-        duration: 0.2,
-        ease: "power2.in",
-      },
-      "-=0.1"
-    );
-
-    // Animate chevron rotation back
     if (chevronRef.current) {
-      gsap.to(chevronRef.current, {
-        rotation: 0,
-        duration: 0.3,
-        ease: "power2.inOut",
-      });
+      gsap.to(chevronRef.current, { rotation: 0, duration: 0.3 });
     }
   }, [onClose]);
 
-  // Hover intent handlers
+  // Hover Intent
   const handleMouseEnter = useCallback(() => {
-    if (hoverTimeoutRef.current) {
-      clearTimeout(hoverTimeoutRef.current);
-      hoverTimeoutRef.current = null;
-    }
-
-    // Hover intent delay (~100ms)
+    if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
     hoverTimeoutRef.current = setTimeout(() => {
-      if (!isOpen) {
-        openDropdown();
-      }
+      if (!isOpen) openDropdown();
     }, 100);
   }, [isOpen, openDropdown]);
 
   const handleMouseLeave = useCallback(() => {
-    if (hoverTimeoutRef.current) {
-      clearTimeout(hoverTimeoutRef.current);
-      hoverTimeoutRef.current = null;
-    }
-
-    // Small delay before closing
+    if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
     hoverTimeoutRef.current = setTimeout(() => {
-      if (isOpen) {
-        closeDropdown();
-      }
+      if (isOpen) closeDropdown();
     }, 80);
   }, [isOpen, closeDropdown]);
 
-  // Cleanup timeout on unmount
   useEffect(() => {
-    return () => {
-      if (hoverTimeoutRef.current) {
-        clearTimeout(hoverTimeoutRef.current);
-      }
-    };
+    return () => { if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current); };
   }, []);
 
-  // Link hover animation
-  const handleLinkMouseEnter = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    gsap.to(e.currentTarget, {
-      x: 3,
-      duration: 0.2,
-      ease: "power2.out",
-    });
-  };
-
-  const handleLinkMouseLeave = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    gsap.to(e.currentTarget, {
-      x: 0,
-      duration: 0.2,
-      ease: "power2.out",
-    });
-  };
-
   return (
-    <div
-      className="relative"
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-    >
-      {/* Trigger Button */}
+    <div className="relative" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
       <button className="flex items-center gap-2 font-mono text-base tracking-wider text-adaline-dark hover:text-adaline-dark/70 transition-colors duration-200 uppercase">
         PRODUCTS
         <svg
@@ -332,124 +206,71 @@ export default function ProductsDropdown({ isOpen, onOpen, onClose }: ProductsDr
           className="text-adaline-dark/60"
           style={{ transformOrigin: "center" }}
         >
-          <path
-            d="M2 4L6 8L10 4"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            fill="none"
-          />
+          <path d="M2 4L6 8L10 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
         </svg>
       </button>
 
-      {/* Full-Width Mega Menu Dropdown */}
       <div
         ref={dropdownRef}
-        className={`fixed left-0 right-0 top-[80px] bg-adaline-cream border-t border-b border-black/5 ${
+        className={`fixed left-0 right-0 top-[80px] bg-[#FAF8F5] border-b border-[rgba(0,0,0,0.05)] ${
           isOpen ? "pointer-events-auto" : "pointer-events-none opacity-0"
         }`}
-        style={{
-          willChange: "transform, opacity",
-        }}
+        style={{ willChange: "transform, opacity" }}
       >
-        {/* CRITICAL: Horizontal dotted line divider */}
-        <div className="absolute left-0 right-0 top-0 h-[2px] overflow-hidden pointer-events-none">
-          <svg 
-            className="absolute left-1/2 -translate-x-1/2 w-[200vw] min-w-[4000px]" 
-            height="2" 
-            viewBox="0 0 4000 2" 
-            fill="none" 
-            xmlns="http://www.w3.org/2000/svg" 
-            style={{ opacity: 0.2 }}
-          >
-            <path 
-              d="M0 1 H4000" 
-              stroke="#264013" 
-              strokeWidth="1" 
-              strokeDasharray="4 4" 
-              vectorEffect="non-scaling-stroke"
-            />
-          </svg>
-        </div>
-        <div className="max-w-7xl mx-auto px-8 sm:px-12 lg:px-16 py-12">
-          {/* Top Section - Multilayer Icon Cards */}
-          <div className="grid grid-cols-4 gap-8 mb-10">
-            {products.map((product, index) => (
-              <div
-                key={product.id}
-                ref={(el) => setIconCardRef(el, index)}
-                className="flex flex-col items-start cursor-pointer group"
-                style={{ willChange: "transform, opacity" }}
+        {/* TOP DOTTED LINE */}
+        <DottedLine className="top-0" />
+
+        <div className="max-w-[1500px] mx-auto px-20 py-20">
+          {/* ICONS ROW */}
+          <div className="grid grid-cols-4 gap-[60px] mb-12">
+            {products.map((product, i) => (
+              <div 
+                key={`icon-${product.id}`} 
+                ref={el => { iconRefs.current[i] = el; }}
+                className="flex flex-col items-start pl-4" // slight pl to center visually
               >
-                {/* Multilayer Living Icon */}
-                <MultilayerIcon
+                <MultilayerIcon 
                   type={product.iconType}
                   number={product.number}
-                  className="w-28 h-28 mb-3"
+                  className="w-[180px] h-[180px]" // Exact requested size
                 />
-                {/* Product title */}
-                <span className="text-sm font-medium tracking-wider text-adaline-dark uppercase">
-                  {product.title}
-                </span>
               </div>
             ))}
           </div>
 
-          {/* Divider */}
-          <div
-            ref={dividerRef}
-            className="h-px bg-adaline-dark/10 mb-10 origin-left"
-            style={{ willChange: "transform, opacity" }}
-          />
+          {/* MIDDLE DOTTED LINE */}
+          <div className="relative w-full h-[2px] mb-12">
+             <DottedLine />
+          </div>
 
-          {/* Bottom Section - Content Columns */}
-          <div className="grid grid-cols-4 gap-8">
-            {products.map((product, index) => (
-              <div
-                key={`content-${product.id}`}
-                ref={(el) => setColumnRef(el, index)}
-                className="flex flex-col"
-                style={{ willChange: "transform, opacity" }}
+          {/* TEXT CONTENT ROW */}
+          <div className="grid grid-cols-4 gap-[60px]">
+            {products.map((product, i) => (
+              <div 
+                key={`text-${product.id}`}
+                ref={el => { textRefs.current[i] = el; }}
+                className="flex flex-col pl-4"
               >
-                {/* Category label */}
-                <span className="text-xs font-medium tracking-wider text-adaline-dark/60 uppercase mb-3">
+                <span className="text-[13px] font-semibold tracking-[0.15em] text-[#2d4a1f] uppercase mb-5">
                   {product.title}
                 </span>
                 
-                {/* Main heading */}
-                <h3 className="text-2xl font-serif text-adaline-dark leading-tight mb-5 whitespace-pre-line">
+                <h3 
+                  className="text-[38px] font-normal leading-[1.2] mb-7 text-black whitespace-pre-line"
+                  style={{ fontFamily: 'Georgia, serif' }}
+                >
                   {product.heading}
                 </h3>
                 
-                {/* Links */}
-                <div className="flex flex-col gap-2">
-                  {product.links.map((link) => (
+                <div className="flex flex-col gap-[14px]">
+                  {product.links.map(link => (
                     <Link
                       key={link.href}
                       href={link.href}
-                      className="text-sm text-adaline-dark/70 hover:text-adaline-dark transition-colors duration-200 flex items-center gap-1"
-                      onMouseEnter={handleLinkMouseEnter}
-                      onMouseLeave={handleLinkMouseLeave}
+                      className="text-[17px] text-[#4a4a4a] hover:text-black transition-colors flex items-center gap-1 group"
                     >
                       {link.label}
-                      {link.external && (
-                        <svg
-                          width="12"
-                          height="12"
-                          viewBox="0 0 12 12"
-                          fill="none"
-                          className="ml-0.5"
-                        >
-                          <path
-                            d="M3.5 8.5L8.5 3.5M8.5 3.5H4.5M8.5 3.5V7.5"
-                            stroke="currentColor"
-                            strokeWidth="1.2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          />
-                        </svg>
-                      )}
+                      {link.external && <span className="text-[12px] opacity-70">↗</span>}
                     </Link>
                   ))}
                 </div>
